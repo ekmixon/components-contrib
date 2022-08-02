@@ -33,7 +33,7 @@ def parseArgs():
             arg_parser.print_help()
             sys.exit(-1)
 
-    print('Arguments parsed: {}'.format(args))
+    print(f'Arguments parsed: {args}')
     return args
 
 def getResponse(url):
@@ -66,19 +66,11 @@ def writeAllowedIPRangesJSON(outpath):
 
             if prevStart == '':
                 prevStart = start
-            if prevEnd == '':
-                prevEnd = end
-            elif prevEnd + 65536 > start:
-                # If the current IP range is within the granularity of a /16
-                # subnet mask to the previous range, coalesce them into one.
-                # This is necessary to get the number of rules down to ~100.
-                prevEnd = end
-            else:
+            if prevEnd != '' and prevEnd + 65536 <= start:
                 ipRange = [str(prevStart), str(prevEnd)]
                 ipRanges.append(ipRange)
                 prevStart = start
-                prevEnd = end
-
+            prevEnd = end
     if prevStart != '' and prevEnd != '':
         ipRange = [str(prevStart), str(prevEnd)]
         ipRanges.append(ipRange)
